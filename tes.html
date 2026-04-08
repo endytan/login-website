@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Autentic BK Login</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+    }
+
+    .container {
+      display: flex;
+      width: 800px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+
+    .left {
+      flex: 1;
+      padding: 40px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .input-group {
+      margin-bottom: 15px;
+    }
+
+    .input-group input {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      outline: none;
+      font-size: 14px;
+    }
+
+    /* ADVANCED SLIDER CAPTCHA */
+    .slider-box {
+      position: relative;
+      background: rgba(255,255,255,0.1);
+      border-radius: 10px;
+      height: 50px;
+      margin-bottom: 15px;
+      overflow: hidden;
+    }
+
+    .slider-track {
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #00c6ff, #0072ff);
+      transition: width 0.2s;
+    }
+
+    .slider-button {
+      position: absolute;
+      top: 5px;
+      left: 5px;
+      width: 40px;
+      height: 40px;
+      background: white;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: black;
+      font-weight: bold;
+      user-select: none;
+    }
+
+    .slider-text {
+      position: absolute;
+      width: 100%;
+      text-align: center;
+      line-height: 50px;
+      font-size: 13px;
+      opacity: 0.7;
+    }
+
+    .success {
+      color: #00ffcc;
+      font-size: 13px;
+      margin-top: 5px;
+    }
+
+    .btn {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      background: #00c6ff;
+      color: black;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .right {
+      flex: 1;
+      background: rgba(0,0,0,0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+    }
+
+    .logo {
+      font-size: 40px;
+      font-weight: bold;
+      letter-spacing: 3px;
+      color: #00c6ff;
+    }
+
+    .error {
+      color: #ff4d4d;
+      margin-top: 10px;
+      font-size: 13px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <div class="left">
+    <h2>Login BK</h2>
+
+    <div class="input-group">
+      <input type="text" id="user" placeholder="User ID">
+    </div>
+
+    <div class="input-group">
+      <input type="password" id="pass" placeholder="Password">
+    </div>
+
+    <!-- ADVANCED CAPTCHA -->
+    <div class="slider-box" id="sliderBox">
+      <div class="slider-track" id="track"></div>
+      <div class="slider-text" id="sliderText">Geser untuk verifikasi</div>
+      <div class="slider-button" id="sliderBtn">»</div>
+    </div>
+
+    <div id="sliderStatus"></div>
+
+    <button class="btn" onclick="login()">Login</button>
+
+    <div class="error" id="errorMsg"></div>
+  </div>
+
+  <div class="right">
+    <div class="logo">AUTENTIC</div>
+  </div>
+</div>
+
+<script>
+  let isDown = false;
+  let startX;
+  let verified = false;
+
+  const btn = document.getElementById('sliderBtn');
+  const track = document.getElementById('track');
+  const box = document.getElementById('sliderBox');
+  const text = document.getElementById('sliderText');
+  const status = document.getElementById('sliderStatus');
+
+  btn.onmousedown = function(e) {
+    isDown = true;
+    startX = e.clientX;
+  }
+
+  document.onmouseup = function() {
+    if(!verified) {
+      btn.style.left = '5px';
+      track.style.width = '0%';
+    }
+    isDown = false;
+  }
+
+  document.onmousemove = function(e) {
+    if(!isDown || verified) return;
+
+    let move = e.clientX - startX;
+    let max = box.offsetWidth - 50;
+
+    if(move < 0) move = 0;
+    if(move > max) move = max;
+
+    btn.style.left = move + 'px';
+    track.style.width = (move / max * 100) + '%';
+
+    if(move >= max - 5) {
+      verified = true;
+      text.innerText = '✔ Berhasil';
+      status.innerHTML = '<span class="success">Verifikasi sukses</span>';
+    }
+  }
+
+  function login() {
+    const user = document.getElementById('user').value;
+    const pass = document.getElementById('pass').value;
+    const errorMsg = document.getElementById('errorMsg');
+
+    if(user === 'endy' && pass === 'ganteng' && verified) {
+      window.location.href = 'tes1.html';
+    } else {
+      errorMsg.innerText = 'Login gagal!';
+    }
+  }
+
+  // ENTER KEY SUPPORT
+  document.addEventListener('keypress', function(e) {
+    if(e.key === 'Enter') {
+      login();
+    }
+  });
+
+</script>
+
+</body>
+</html>
