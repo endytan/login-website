@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Autentic BK Dashboard</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+      height: 100vh;
+      display: flex;
+      color: white;
+    }
+
+    .sidebar {
+      width: 220px;
+      background: rgba(0,0,0,0.4);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .account-name {
+      font-size: 20px;
+      font-weight: bold;
+      margin-bottom: 5px;
+      color: #00c6ff;
+    }
+
+    .account-saldo {
+      font-size: 16px;
+      margin-bottom: 30px;
+      color: #ffffff;
+    }
+
+    .menu {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .menu button {
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      background: rgba(255,255,255,0.1);
+      color: white;
+      cursor: pointer;
+      text-align: left;
+      transition: 0.3s;
+    }
+
+    .menu button:hover {
+      background: #00c6ff;
+      color: black;
+    }
+
+    .logout-btn {
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      background: rgba(255, 0, 0, 0.2);
+      color: #ff4d4d;
+      cursor: pointer;
+      transition: 0.3s;
+      width: 100%;
+    }
+
+    .logout-btn:hover {
+      background: #ff4d4d;
+      color: white;
+    }
+
+    .main {
+      flex: 1;
+      padding: 30px;
+    }
+
+    .header {
+      font-size: 24px;
+      margin-bottom: 20px;
+    }
+
+    .content-box {
+      background: rgba(255,255,255,0.05);
+      border-radius: 15px;
+      padding: 20px;
+      min-height: 300px;
+    }
+
+    /* History */
+    .history-menu {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+
+    .history-menu button {
+      flex: 1;
+      padding: 8px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      background: rgba(255,255,255,0.1);
+      color: white;
+      transition: 0.3s;
+    }
+
+    .history-menu button.active, .history-menu button:hover {
+      background: #00c6ff;
+      color: black;
+    }
+
+    .filter-date {
+      margin-bottom: 15px;
+    }
+
+    .history-list {
+      max-height: 300px;
+      overflow-y: auto;
+      background: rgba(255,255,255,0.1);
+      border-radius: 10px;
+      padding: 10px;
+    }
+
+    .history-item {
+      margin-bottom: 10px;
+      padding: 8px;
+      border-bottom: 1px solid rgba(255,255,255,0.2);
+    }
+
+    /* Trade */
+    .trade-form {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      max-width: 400px;
+    }
+
+    .trade-form input, .trade-form select {
+      padding: 10px;
+      border-radius: 8px;
+      border: none;
+      outline: none;
+      font-size: 14px;
+    }
+
+    .trade-form button {
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      background: #00c6ff;
+      color: black;
+      font-weight: bold;
+      transition: 0.3s;
+    }
+
+    .trade-form button:hover {
+      background: #0072ff;
+      color: white;
+    }
+
+    .broker-form input {
+      padding: 10px;
+      border-radius: 8px;
+      border: none;
+      outline: none;
+      font-size: 14px;
+      margin-bottom: 10px;
+    }
+    .broker-form button {
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      background: #00c6ff;
+      color: black;
+      font-weight: bold;
+      transition: 0.3s;
+    }
+    .broker-form button:hover {
+      background: #0072ff;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+
+<div class="sidebar">
+  <div>
+    <div class="account-name">EndyTrade</div>
+    <div class="account-saldo">Saldo: $0</div>
+
+    <div class="menu">
+      <button onclick="showMenu('trade')">Trade</button>
+      <button onclick="showMenu('history')">History</button>
+      <button onclick="showMenu('broker')">Broker</button>
+    </div>
+  </div>
+
+  <div>
+    <button class="logout-btn" onclick="logout()">Logout</button>
+  </div>
+</div>
+
+<div class="main">
+  <div class="header">Dashboard</div>
+  <div class="content-box" id="content">
+    Selamat datang di Autentic BK 🚀
+  </div>
+</div>
+
+<script>
+  // Data dummy untuk history
+  const deposits = [];
+  const withdraws = [];
+  const profits = [];
+
+  let saldo = 0;
+  function updateSaldo() {
+    document.querySelector('.account-saldo').innerText = `Saldo: $${saldo}`;
+  }
+  updateSaldo();
+
+  let currentHistory = 'deposit';
+
+  function showMenu(menu) {
+    const content = document.getElementById('content');
+
+    if(menu === 'trade') {
+      content.innerHTML = `
+        <h3>Trade</h3>
+        <div class="trade-form">
+          <label>Posisi yang ingin dibuka:</label>
+          <input type="number" id="tradePos" min="1" value="1">
+          <label>Lot:</label>
+          <input type="number" id="tradeLot" step="0.01" value="0.01">
+          <label>SL ($):</label>
+          <input type="number" id="tradeSL" value="50">
+          <label>TP ($):</label>
+          <input type="number" id="tradeTP" value="100">
+          <button onclick="openTrade('buy')">BUY</button>
+          <button onclick="openTrade('sell')">SELL</button>
+          <button onclick="closeAllTrades()">Close All</button>
+        </div>
+      `;
+    } else if(menu === 'history') {
+      content.innerHTML = `
+        <h3>History</h3>
+        <div class="history-menu">
+          <button id="depositBtn" class="active" onclick="showHistory('deposit')">Deposit</button>
+          <button id="withdrawBtn" onclick="showHistory('withdraw')">Withdraw</button>
+          <button id="profitBtn" onclick="showHistory('profit')">Keuntungan</button>
+        </div>
+        <div class="filter-date">
+          <label>Dari: <input type="date" id="startDate"></label>
+          <label>Sampai: <input type="date" id="endDate"></label>
+          <button onclick="filterHistory()">Terapkan</button>
+        </div>
+        <div class="history-list" id="historyList">
+          <p>Belum ada data.</p>
+        </div>
+      `;
+      showHistory('deposit');
+    } else if(menu === 'broker') {
+      content.innerHTML = `
+        <h3>Broker</h3>
+        <div class="broker-form">
+          <input type="text" id="brokerServer" placeholder="Server Broker">
+          <input type="text" id="brokerLogin" placeholder="Login">
+          <input type="password" id="brokerPass" placeholder="Password">
+          <button onclick="connectBroker()">Connect Broker</button>
+          <div id="brokerStatus" style="margin-top:10px; color:#00c6ff;"></div>
+        </div>
+      `;
+    }
+  }
+
+  function showHistory(type) {
+    currentHistory = type;
+    document.getElementById('depositBtn')?.classList.remove('active');
+    document.getElementById('withdrawBtn')?.classList.remove('active');
+    document.getElementById('profitBtn')?.classList.remove('active');
+
+    if(type === 'deposit') document.getElementById('depositBtn')?.classList.add('active');
+    if(type === 'withdraw') document.getElementById('withdrawBtn')?.classList.add('active');
+    if(type === 'profit') document.getElementById('profitBtn')?.classList.add('active');
+
+    displayHistory();
+  }
+
+  function displayHistory() {
+    const listEl = document.getElementById('historyList');
+    const start = document.getElementById('startDate')?.value;
+    const end = document.getElementById('endDate')?.value;
+
+    let data;
+    if(currentHistory === 'deposit') data = deposits;
+    else if(currentHistory === 'withdraw') data = withdraws;
+    else data = profits;
+
+    if(start) data = data.filter(d => d.date >= start);
+    if(end) data = data.filter(d => d.date <= end);
+
+    if(!data || data.length === 0) {
+      listEl.innerHTML = '<p>Belum ada data.</p>';
+      return;
+    }
+
+    listEl.innerHTML = data.map(d => `
+      <div class="history-item">
+        <strong>Tanggal:</strong> ${d.date} <br>
+        <strong>Jumlah:</strong> $${d.amount}
+      </div>
+    `).join('');
+  }
+
+  function filterHistory() {
+    displayHistory();
+  }
+
+  function openTrade(type) {
+    const pos = Number(document.getElementById('tradePos').value);
+    const lot = Number(document.getElementById('tradeLot').value);
+    const sl = Number(document.getElementById('tradeSL').value);
+    const tp = Number(document.getElementById('tradeTP').value);
+
+    alert(`${type.toUpperCase()} executed!\nPosisi: ${pos}\nLot: ${lot}\nSL: $${sl}\nTP: $${tp}\n(Hanya demo, belum konek MT5)`);
+  }
+
+  function closeAllTrades() {
+    alert('Close All executed! (Demo, belum konek pasar nyata)');
+  }
+
+  function connectBroker() {
+    const server = document.getElementById('brokerServer').value;
+    const login = document.getElementById('brokerLogin').value;
+    const pass = document.getElementById('brokerPass').value;
+
+    if(server && login && pass) {
+      document.getElementById('brokerStatus').innerText = `Connected to ${server} (Demo)`;
+    } else {
+      document.getElementById('brokerStatus').innerText = 'Isi semua data broker!';
+    }
+  }
+
+  function logout() {
+    window.location.href = 'tes.html';
+  }
+</script>
+
+</body>
+</html>
